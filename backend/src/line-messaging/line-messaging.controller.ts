@@ -21,14 +21,7 @@ export class LineMessagingController {
   }
 
   @Post('/webhook')
-  getWebhookResponse(@Body() body: WebhookRequestBody) {
-    try {
-      return this.lineMessagingService.getEventFromLine(body.events);
-    } catch (err) {
-      throw new BadRequestException(
-        'Cannot get event from line because : ',
-        err,
-      );
-    }
+  handleWebhook(@Body() body: WebhookRequestBody) {
+    return this.lineMessagingService.handleLineEvents(body.events);
   }
 }
