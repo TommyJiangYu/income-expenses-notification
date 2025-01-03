@@ -22,8 +22,8 @@ const config: DataSourceOptions = {
   database: process.env.DB_NAME,
   synchronize: false,
   logging: false,
-  entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  migrations: ['src/migrations/**/*.ts'],
+  entities: ['dist/**/*.entity{.ts,.js}'],
+  migrations: ['dist/migrations/*{.ts,.js}'],
   subscribers: [],
   migrationsTableName: 'migrations',
 };

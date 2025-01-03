@@ -21,7 +21,8 @@ const env = process.env.NODE_ENV;
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config) => config.get('ormconfig'),
+      useFactory: async (configService: ConfigService) =>
+        configService.get('ormconfig'),
     }),
     LineMessagingModule,
     DialogflowModule,
