@@ -15,13 +15,13 @@ const { MessagingApiClient } = messagingApi;
 
 @Injectable()
 export class LineMessagingService {
-  private client: messagingApi.MessagingApiClient;
+  private readonly messagingApiClient: messagingApi.MessagingApiClient;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly dialogflowService: DialogflowService,
   ) {
-    this.client = new MessagingApiClient({
+    this.messagingApiClient = new MessagingApiClient({
       channelAccessToken: this.configService.get('LINE_CHANNEL_ACCESS_TOKEN'),
     });
   }
@@ -55,7 +55,7 @@ export class LineMessagingService {
       text: result.fulfillmentText,
     };
 
-    this.client.replyMessage({
+    this.messagingApiClient.replyMessage({
       replyToken: event.replyToken,
       messages: [message],
     });
