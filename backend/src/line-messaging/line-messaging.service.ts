@@ -8,7 +8,7 @@ import {
   TextEventMessage,
   WebhookEvent,
 } from '@line/bot-sdk';
-import { MessageType } from './types/line-messaging.type';
+import { MessageType, PushMessage } from './types/line-messaging.type';
 import { Language } from '../dialogflow/types/dialogflow.type';
 import { UserService } from 'src/user/user.service';
 
@@ -53,15 +53,12 @@ export class LineMessagingService {
       const lineProfile = await this.messagingApiClient.getProfile(lineUserId);
       const user = await this.userService.findByUserLineId(lineProfile.userId);
 
-      console.log('user : ', user);
-
       if (!user) {
         this.userService.create({
           name: lineProfile.displayName,
           lineUserId: lineProfile.userId,
         });
       }
-      console.log('lineProfile : ', lineProfile);
     }
 
     const result = await this.dialogflowService.detectDialogflowIntent({
@@ -78,6 +75,13 @@ export class LineMessagingService {
     this.messagingApiClient.replyMessage({
       replyToken: event.replyToken,
       messages: [message],
+    });
+  }
+
+  async pushMessage(messageRequest: PushMessage) {
+    await this.messagingApiClient.pushMessage({
+      to: messageRequest.to,
+      messages: messageRequest.messages,
     });
   }
 }

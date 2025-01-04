@@ -8,5 +8,6 @@ import { UserModule } from 'src/user/user.module';
   imports: [DialogflowModule, UserModule],
   controllers: [LineMessagingController],
   providers: [LineMessagingService],
+  exports: [LineMessagingService],
 })
 export class LineMessagingModule {}

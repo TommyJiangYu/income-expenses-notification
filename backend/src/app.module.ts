@@ -6,9 +6,11 @@ import { ConnectionModule } from './connection/connection.module';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { UserModule } from './user/user.module';
-import { ScheduleModule } from './schedule/schedule.module';
+import { ScheduleModule as TaskScheduleModule } from './schedule/schedule.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from './ormconfig';
+import { ScheduleModule } from '@nestjs/schedule';
+import { JobHandlerModule } from './job-handler/job-handler.module';
 
 const env = process.env.NODE_ENV;
 
@@ -19,6 +21,7 @@ const env = process.env.NODE_ENV;
       envFilePath: env === 'development' ? '.env' : `.env.${env}`,
       load: [ormconfig],
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) =>
@@ -28,7 +31,8 @@ const env = process.env.NODE_ENV;
     DialogflowModule,
     ConnectionModule,
     UserModule,
-    ScheduleModule,
+    TaskScheduleModule,
+    JobHandlerModule,
   ],
   providers: [
     {
