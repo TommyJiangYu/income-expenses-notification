@@ -6,8 +6,6 @@ import path from 'path';
 
 const env = process.env.NODE_ENV || 'development';
 
-console.log('env : ', env);
-
 dotenvConfig({
   path:
     env === 'development' ? '.env' : path.resolve(__dirname, `../.env.${env}`),

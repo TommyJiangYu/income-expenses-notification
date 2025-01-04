@@ -6,6 +6,9 @@ import {
   UpdateDateColumn,
   ManyToMany,
   JoinTable,
+  AfterInsert,
+  AfterUpdate,
+  AfterRemove,
 } from 'typeorm';
 import { Schedule } from '../schedule/schedule.entity';
 
@@ -17,7 +20,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   line_user_id: string;
 
   @CreateDateColumn()
@@ -41,4 +44,19 @@ export class User {
     },
   })
   schedules: Schedule[];
+
+  @AfterInsert()
+  logCreate() {
+    console.log('Inserting user id :', this.id);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updating user id :', this.id);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removing user id :', this.id);
+  }
 }

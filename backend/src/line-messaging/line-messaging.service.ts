@@ -10,6 +10,7 @@ import {
 } from '@line/bot-sdk';
 import { MessageType } from './types/line-messaging.type';
 import { Language } from '../dialogflow/types/dialogflow.type';
+import { UserService } from 'src/user/user.service';
 
 const { MessagingApiClient } = messagingApi;
 
@@ -20,6 +21,7 @@ export class LineMessagingService {
   constructor(
     private readonly configService: ConfigService,
     private readonly dialogflowService: DialogflowService,
+    private readonly userService: UserService,
   ) {
     this.messagingApiClient = new MessagingApiClient({
       channelAccessToken: this.configService.get('LINE_CHANNEL_ACCESS_TOKEN'),
@@ -28,6 +30,8 @@ export class LineMessagingService {
 
   async handleLineEvents(events: WebhookEvent[]) {
     try {
+      console.log('events : ', events);
+
       for (const event of events) {
         if (event.type === 'message') {
           await this.replyToMessage(event as MessageEvent);
@@ -43,6 +47,22 @@ export class LineMessagingService {
 
   async replyToMessage(event: MessageEvent) {
     const eventMessage = event.message as TextEventMessage;
+    const lineUserId = event.source.userId || '';
+
+    if (!!lineUserId) {
+      const lineProfile = await this.messagingApiClient.getProfile(lineUserId);
+      const user = await this.userService.findByUserLineId(lineProfile.userId);
+
+      console.log('user : ', user);
+
+      if (!user) {
+        this.userService.create({
+          name: lineProfile.displayName,
+          lineUserId: lineProfile.userId,
+        });
+      }
+      console.log('lineProfile : ', lineProfile);
+    }
 
     const result = await this.dialogflowService.detectDialogflowIntent({
       languageCode: Language.THAI,
