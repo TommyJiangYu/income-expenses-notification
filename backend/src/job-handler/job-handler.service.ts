@@ -1,15 +1,20 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Schedule } from 'src/schedule/schedule.entity';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import generateCronExpression from './utils/generateCronExpression';
+import { LineMessagingService } from 'src/line-messaging/line-messaging.service';
+import { Message } from '@line/bot-sdk';
 
 @Injectable()
 export class JobHandlerService implements OnModuleInit, OnModuleDestroy {
   private jobs: Record<number, CronJob> = {};
 
-  constructor(private readonly scheduleService: ScheduleService) {}
+  constructor(
+    private readonly scheduleService: ScheduleService,
+    private readonly lineMessagingService: LineMessagingService,
+  ) {}
 
   async onModuleInit() {
     const schedules = await this.scheduleService.findActive();
@@ -18,6 +23,14 @@ export class JobHandlerService implements OnModuleInit, OnModuleDestroy {
 
   onModuleDestroy() {
     Object.values(this.jobs).forEach((job) => job.stop());
+  }
+
+  // ต้องมี Handle จังหวะ update / delete ด้วยนะ
+  @OnEvent('schedule.created')
+  async handleCreateNewJob(schedule: Schedule) {
+    if (schedule && schedule.is_active) {
+      this.cronjobHandler(schedule);
+    }
   }
 
   private cronjobHandler(schedule: Schedule) {
@@ -31,6 +44,19 @@ export class JobHandlerService implements OnModuleInit, OnModuleDestroy {
     }
 
     const job = new CronJob(cronExpression, () => {
+      // const textMessage: Message = {
+      //   type: 'text',
+      //   text:
+      //     schedule.description +
+      //     'ซึ่งตอนนี้เวลา : ' +
+      //     schedule.reminder_time.toLocaleString(),
+      // };
+
+      // this.lineMessagingService.pushMessage({
+      //   to: '',
+      //   messages: [textMessage],
+      // });
+
       console.log(
         `Reminder for Schedule ID: ${schedule.id} description: ${schedule.description} triggered at ${new Date()}`,
       );

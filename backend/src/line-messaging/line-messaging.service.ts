@@ -43,6 +43,13 @@ export class LineMessagingService {
     }
   }
 
+  async pushMessage(messageRequest: PushMessage) {
+    await this.messagingApiClient.pushMessage({
+      to: messageRequest.to,
+      messages: messageRequest.messages,
+    });
+  }
+
   async replyToMessage(event: MessageEvent) {
     const eventMessage = event.message as TextEventMessage;
     const lineUserId = event.source.userId || '';
@@ -73,13 +80,6 @@ export class LineMessagingService {
     this.messagingApiClient.replyMessage({
       replyToken: event.replyToken,
       messages: [message],
-    });
-  }
-
-  async pushMessage(messageRequest: PushMessage) {
-    await this.messagingApiClient.pushMessage({
-      to: messageRequest.to,
-      messages: messageRequest.messages,
     });
   }
 }
