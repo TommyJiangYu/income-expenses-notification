@@ -30,8 +30,6 @@ export class LineMessagingService {
 
   async handleLineEvents(events: WebhookEvent[]) {
     try {
-      console.log('events : ', events);
-
       for (const event of events) {
         if (event.type === 'message') {
           await this.replyToMessage(event as MessageEvent);

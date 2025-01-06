@@ -5,8 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  AfterInsert,
+  AfterUpdate,
+  AfterRemove,
 } from 'typeorm';
 import { User } from '../user/user.entity';
+import { REPEAT_PATTERN } from './types/schedule.type';
 
 @Entity()
 export class Schedule {
@@ -17,10 +21,20 @@ export class Schedule {
   name: string;
 
   @Column('text')
-  detail: string;
+  description: string;
 
-  @Column()
-  schedule_time: string;
+  @Column({
+    type: 'enum',
+    enum: REPEAT_PATTERN,
+    nullable: true,
+  })
+  repeat_pattern: REPEAT_PATTERN;
+
+  @Column({ nullable: true })
+  reminder_time: Date;
+
+  @Column({ default: true })
+  is_active: boolean;
 
   @Column()
   start_date: Date;
@@ -36,4 +50,19 @@ export class Schedule {
 
   @ManyToMany(() => User, (user) => user.schedules)
   users: User[];
+
+  @AfterInsert()
+  logCreate() {
+    console.log('Inserting schedule id :', this.id);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updating schedule id :', this.id);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removing schedule id :', this.id);
+  }
 }
